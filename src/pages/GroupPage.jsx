@@ -1,18 +1,19 @@
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Hash, Users, X, ArrowRight } from 'lucide-react'
+import { Plus, Hash, Users, ArrowRight } from 'lucide-react'
 import { useGroups } from '../hooks/useGroups'
-import Layout from '../components/Layout'
 import toast from 'react-hot-toast'
+import Layout from '../components/Layout'
+import BaseModal from '../components/BaseModal'
+import { PageHeader, Card, PrimaryButton, FormField, Input } from '../components/DesignSystem'
 
 export default function GroupPage() {
   const navigate = useNavigate()
   const { groups, loading, createGroup, joinGroup } = useGroups()
-  const [modal,     setModal]     = useState(null)  // 'create' | 'join'
+  const [modal, setModal] = useState(null)   // 'create' | 'join'
   const [groupName, setGroupName] = useState('')
-  const [code,      setCode]      = useState('')
-  const [busy,      setBusy]      = useState(false)
+  const [code, setCode] = useState('')
+  const [busy, setBusy] = useState(false)
 
   function closeModal() { setModal(null); setGroupName(''); setCode('') }
 
@@ -42,102 +43,171 @@ export default function GroupPage() {
 
   return (
     <Layout>
-      <div className="px-5 pt-12 pb-6">
-        <h1 className="font-display font-bold text-2xl text-text mb-1">Groups</h1>
-        <p className="text-text-muted text-sm mb-6">Create or join a group to split expenses</p>
+      <div className="animate-fade-up flex flex-col gap-8">
 
-        {/* Action buttons */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <button onClick={() => setModal('create')}
-            className="flex flex-col items-center gap-2 p-5 rounded-2xl border border-border bg-surface2 hover:border-cyan-500/40 hover:bg-surface active:scale-95 transition-all duration-200">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/15 flex items-center justify-center">
-              <Plus size={20} className="text-cyan-400" />
+        {/* ── Page Header ── */}
+        <PageHeader
+          title="Groups"
+          subtitle="Create or join a group to split expenses"
+        />
+
+        {/* ── 12-col grid ──
+              Mobile  : single column (actions stacked above ledger)
+              ≥1024px : 4 cols (actions) + 8 cols (ledger)                    */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          {/* Left — Action tiles */}
+          <div className="lg:col-span-4">
+            <h2 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4">
+              Quick Actions
+            </h2>
+            <div className="grid grid-cols-2 gap-4">
+              <Card
+                onClick={() => setModal('create')}
+                className="flex flex-col items-center justify-center gap-3 text-center min-h-[140px]"
+                style={{ padding: 28 }}
+              >
+                <div className="w-12 h-12 rounded-xl neu-inset flex items-center justify-center text-primary bg-bg">
+                  <Plus size={22} strokeWidth={2.5} />
+                </div>
+                <span className="text-xs font-extrabold text-text uppercase tracking-wider">
+                  New Group
+                </span>
+              </Card>
+
+              <Card
+                onClick={() => setModal('join')}
+                className="flex flex-col items-center justify-center gap-3 text-center min-h-[140px]"
+                style={{ padding: 28 }}
+              >
+                <div className="w-12 h-12 rounded-xl neu-inset flex items-center justify-center text-primary bg-bg">
+                  <Hash size={20} strokeWidth={2.5} />
+                </div>
+                <span className="text-xs font-extrabold text-text uppercase tracking-wider">
+                  Join Group
+                </span>
+              </Card>
             </div>
-            <span className="text-sm font-semibold text-text">New Group</span>
-          </button>
-          <button onClick={() => setModal('join')}
-            className="flex flex-col items-center gap-2 p-5 rounded-2xl border border-border bg-surface2 hover:border-teal-500/40 hover:bg-surface active:scale-95 transition-all duration-200">
-            <div className="w-10 h-10 rounded-xl bg-teal-500/15 flex items-center justify-center">
-              <Hash size={20} className="text-teal-400" />
-            </div>
-            <span className="text-sm font-semibold text-text">Join Group</span>
-          </button>
+          </div>
+
+          {/* Right — Groups ledger */}
+          <div className="lg:col-span-8">
+            <h2 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4">
+              Active Ledgers
+            </h2>
+
+            {loading ? (
+              <div className="flex flex-col gap-3">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="skeleton h-[72px] rounded-2xl" />
+                ))}
+              </div>
+            ) : groups.length === 0 ? (
+              <div className="card-inset rounded-2xl flex flex-col items-center justify-center gap-4 py-16 text-center min-h-[220px]">
+                <div className="w-14 h-14 rounded-full neu-extruded flex items-center justify-center text-primary bg-bg">
+                  <Users size={22} />
+                </div>
+                <div>
+                  <p className="font-bold text-text text-sm">No groups yet</p>
+                  <p className="text-text-muted text-xs mt-1 max-w-[26ch] mx-auto">
+                    Create a group to get started splitting bills with friends.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {groups.map(group => (
+                  <button
+                    key={group.id}
+                    onClick={() => navigate(`/groups/${group.id}`)}
+                    className="w-full flex items-center gap-4 rounded-2xl neu-extruded bg-bg interactive-card text-left border-none cursor-pointer"
+                    style={{ padding: 20 }}
+                  >
+                    <div className="w-11 h-11 rounded-xl neu-inset flex items-center justify-center flex-shrink-0 text-primary bg-bg">
+                      <Users size={18} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-extrabold text-text text-sm truncate">{group.name}</p>
+                      <p className="text-[10px] text-text-muted font-bold font-mono tracking-wider mt-0.5">
+                        CODE: {group.invite_code}
+                      </p>
+                    </div>
+                    <div className="w-8 h-8 rounded-full neu-inset flex items-center justify-center text-text-muted hover:text-primary flex-shrink-0">
+                      <ArrowRight size={14} />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
         </div>
-
-        {/* Groups list */}
-        {loading ? (
-          <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="skeleton h-16 rounded-2xl" />)}</div>
-        ) : groups.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 py-12 text-center">
-            <div className="text-4xl mb-2">🏠</div>
-            <p className="font-semibold text-text">No groups yet</p>
-            <p className="text-text-muted text-sm">Create a group to get started splitting bills with friends.</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {groups.map((group, i) => (
-              <motion.button key={group.id}
-                initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.05 }}
-                onClick={() => navigate(`/groups/${group.id}`)}
-                className="w-full card flex items-center gap-3 hover:border-cyan-500/30 hover:bg-surface2 transition-all duration-200 active:scale-[0.98] text-left">
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-500/20 to-teal-500/20 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                  <Users size={20} className="text-cyan-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-text text-sm truncate">{group.name}</p>
-                  <p className="text-xs text-text-muted font-mono mt-0.5">Code: {group.invite_code}</p>
-                </div>
-                <ArrowRight size={16} className="text-text-muted flex-shrink-0" />
-              </motion.button>
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* Modals */}
-      <AnimatePresence>
-        {modal && (
-          <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" onClick={closeModal} />
-            <motion.div
-              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed bottom-0 left-0 right-0 z-50 glass-strong rounded-t-3xl px-5 pt-6 pb-10">
-              <div className="flex items-center justify-between mb-5">
-                <h2 className="font-display font-bold text-lg text-text">
-                  {modal === 'create' ? 'Create Group' : 'Join Group'}
-                </h2>
-                <button onClick={closeModal} className="btn-ghost p-2 rounded-full"><X size={20} /></button>
-              </div>
+      {/* ── Modals ── */}
+      <BaseModal
+        isOpen={modal === 'create'}
+        onClose={closeModal}
+        title="Create Group"
+        size="md"
+        footer={
+          <PrimaryButton
+            type="submit"
+            form="create-group-form"
+            disabled={busy}
+            className="w-full"
+          >
+            <span>{busy ? 'Creating…' : 'Create Group'}</span>
+          </PrimaryButton>
+        }
+      >
+        <form id="create-group-form" onSubmit={handleCreate} className="flex flex-col gap-5">
+          <FormField
+            label="Group Name"
+            helperText="A unique 6-character invite code is generated automatically."
+          >
+            <Input
+              value={groupName}
+              onChange={e => setGroupName(e.target.value)}
+              placeholder="e.g. Goa Trip 2026"
+              autoFocus
+            />
+          </FormField>
+        </form>
+      </BaseModal>
 
-              {modal === 'create' ? (
-                <form onSubmit={handleCreate} className="space-y-4">
-                  <div>
-                    <label className="block text-sm text-text-muted mb-1.5">Group Name</label>
-                    <input value={groupName} onChange={e => setGroupName(e.target.value)}
-                      placeholder="e.g. Goa Trip 2026" className="input-field" autoFocus />
-                    <p className="text-xs text-text-muted mt-1.5">A unique 6-character code will be generated automatically.</p>
-                  </div>
-                  <button type="submit" disabled={busy} className="btn-primary w-full">{busy ? 'Creating...' : 'Create Group'}</button>
-                </form>
-              ) : (
-                <form onSubmit={handleJoin} className="space-y-4">
-                  <div>
-                    <label className="block text-sm text-text-muted mb-1.5">Group Code</label>
-                    <input value={code} onChange={e => setCode(e.target.value.toUpperCase())}
-                      placeholder="e.g. FX9KQ2" className="input-field font-mono tracking-widest text-center text-lg uppercase"
-                      maxLength={6} autoFocus />
-                    <p className="text-xs text-text-muted mt-1.5 text-center">Ask your group admin for the 6-character code.</p>
-                  </div>
-                  <button type="submit" disabled={busy} className="btn-primary w-full">{busy ? 'Joining...' : 'Join Group'}</button>
-                </form>
-              )}
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <BaseModal
+        isOpen={modal === 'join'}
+        onClose={closeModal}
+        title="Join Group"
+        size="md"
+        footer={
+          <PrimaryButton
+            type="submit"
+            form="join-group-form"
+            disabled={busy}
+            className="w-full"
+          >
+            <span>{busy ? 'Joining…' : 'Join Group'}</span>
+          </PrimaryButton>
+        }
+      >
+        <form id="join-group-form" onSubmit={handleJoin} className="flex flex-col gap-5">
+          <FormField
+            label="Group Code"
+            helperText="Ask your group admin for the 6-character code."
+          >
+            <Input
+              value={code}
+              onChange={e => setCode(e.target.value.toUpperCase())}
+              placeholder="FX9KQ2"
+              className="font-mono tracking-widest text-center text-lg uppercase"
+              maxLength={6}
+              autoFocus
+            />
+          </FormField>
+        </form>
+      </BaseModal>
     </Layout>
   )
 }

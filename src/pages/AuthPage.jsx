@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Eye, EyeOff, Zap } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
+import { PrimaryButton, FormField, Input } from '../components/DesignSystem'
 
 export default function AuthPage() {
   const { signIn, signUp } = useAuth()
@@ -16,8 +17,8 @@ export default function AuthPage() {
   async function handleSubmit(e) {
     e.preventDefault()
     if (mode === 'signup' && !fullName.trim()) return toast.error('Enter your full name')
-    if (!email.trim()) return toast.error('Enter your email')
-    if (!password) return toast.error('Enter your password')
+    if (!email.trim())  return toast.error('Enter your email')
+    if (!password)      return toast.error('Enter your password')
     if (password.length < 6) return toast.error('Password must be at least 6 characters')
 
     setLoading(true)
@@ -33,223 +34,116 @@ export default function AuthPage() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: '100dvh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '1.25rem',
-        backgroundColor: '#0d0f14',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Background glow — pointer-events none so it never blocks clicks */}
+    <div className="min-h-screen bg-bg flex flex-col items-center justify-center p-5 relative overflow-hidden">
+
+      {/* Ambient glow */}
       <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '500px',
-          height: '400px',
-          borderRadius: '50%',
-          background: 'radial-gradient(ellipse, rgba(34,211,238,0.12) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }}
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] pointer-events-none opacity-30 z-0"
+        style={{ background: 'radial-gradient(circle, rgba(101,163,13,0.2) 0%, transparent 70%)' }}
       />
 
       {/* Logo */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
-        style={{ marginBottom: '2rem', textAlign: 'center', position: 'relative', zIndex: 1 }}
+        className="mb-8 text-center z-10"
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
-          <div style={{
-            width: '2.5rem', height: '2.5rem', borderRadius: '0.75rem',
-            background: 'rgba(34,211,238,0.15)', border: '1px solid rgba(34,211,238,0.3)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <Zap size={20} color="#22d3ee" />
+        <div className="flex items-center justify-center gap-2.5 mb-2">
+          <div className="w-11 h-11 rounded-2xl neu-extruded flex items-center justify-center bg-bg">
+            <Zap size={20} className="text-primary fill-primary" />
           </div>
-          <span style={{
-            fontFamily: "'Cabinet Grotesk', sans-serif",
-            fontWeight: 800, fontSize: '1.875rem',
-            background: 'linear-gradient(135deg, #22d3ee 0%, #2dd4bf 50%, #34d399 100%)',
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-          }}>
-            Splito
-          </span>
+          <span className="font-display font-black text-3xl text-gradient">Splito</span>
         </div>
-        <p style={{ color: '#718096', fontSize: '0.875rem' }}>Split expenses. No drama.</p>
+        <p className="text-text-muted text-xs font-bold uppercase tracking-widest">
+          Split expenses. No drama.
+        </p>
       </motion.div>
 
       {/* Card */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        style={{
-          width: '100%', maxWidth: '400px', position: 'relative', zIndex: 1,
-          backgroundColor: '#131720', borderRadius: '1.25rem',
-          border: '1px solid #1e2535', padding: '1.75rem',
-          boxShadow: '0 4px 40px rgba(0,0,0,0.5)',
-        }}
+        transition={{ delay: 0.08 }}
+        className="w-full max-w-[420px] z-10 card p-6 md:p-8"
       >
-        {/* Tabs */}
-        <div style={{
-          display: 'flex', marginBottom: '1.5rem',
-          backgroundColor: '#181d28', borderRadius: '0.75rem', padding: '0.25rem',
-        }}>
+        {/* Tab switcher */}
+        <div className="flex p-1.5 mb-6 rounded-2xl neu-inset bg-bg">
           {[
-            { key: 'login',  label: 'Sign In'  },
-            { key: 'signup', label: 'Sign Up'  },
+            { key: 'login',  label: 'Sign In' },
+            { key: 'signup', label: 'Sign Up' },
           ].map(tab => (
             <button
               key={tab.key}
               type="button"
               onClick={() => setMode(tab.key)}
-              style={{
-                flex: 1, padding: '0.5rem', fontSize: '0.875rem', fontWeight: 600,
-                borderRadius: '0.5rem', border: 'none', cursor: 'pointer',
-                transition: 'all 0.2s',
-                backgroundColor: mode === tab.key ? 'rgba(34,211,238,0.15)' : 'transparent',
-                color:           mode === tab.key ? '#22d3ee' : '#718096',
-                boxShadow:       mode === tab.key ? 'inset 0 0 0 1px rgba(34,211,238,0.3)' : 'none',
-              }}
+              className={`flex-1 py-2.5 text-xs font-extrabold uppercase tracking-wider
+                          transition-all duration-200 cursor-pointer rounded-xl border-none
+                          flex items-center justify-center min-h-[40px]
+                          ${mode === tab.key
+                            ? 'neu-extruded text-primary'
+                            : 'text-text-muted hover:text-text bg-transparent'}`}
             >
               {tab.label}
             </button>
           ))}
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-
-          {/* Full Name — only shown in signup */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {mode === 'signup' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-              <label style={{ fontSize: '0.875rem', color: '#718096' }}>Full Name</label>
-              <input
+            <FormField label="Full Name">
+              <Input
                 type="text"
                 value={fullName}
                 onChange={e => setFullName(e.target.value)}
                 placeholder="Vrajesh Sharma"
                 autoComplete="name"
-                style={{
-                  width: '100%', backgroundColor: '#181d28', border: '1px solid #1e2535',
-                  borderRadius: '0.75rem', padding: '0.75rem 1rem',
-                  color: '#e2e8f0', fontSize: '0.9375rem', outline: 'none',
-                  transition: 'border-color 0.2s, box-shadow 0.2s',
-                }}
-                onFocus={e => {
-                  e.target.style.borderColor = 'rgba(34,211,238,0.5)'
-                  e.target.style.boxShadow   = '0 0 0 3px rgba(34,211,238,0.1)'
-                }}
-                onBlur={e => {
-                  e.target.style.borderColor = '#1e2535'
-                  e.target.style.boxShadow   = 'none'
-                }}
               />
-            </div>
+            </FormField>
           )}
 
-          {/* Email */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-            <label style={{ fontSize: '0.875rem', color: '#718096' }}>Email</label>
-            <input
+          <FormField label="Email Address">
+            <Input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="you@example.com"
               autoComplete="email"
-              style={{
-                width: '100%', backgroundColor: '#181d28', border: '1px solid #1e2535',
-                borderRadius: '0.75rem', padding: '0.75rem 1rem',
-                color: '#e2e8f0', fontSize: '0.9375rem', outline: 'none',
-                transition: 'border-color 0.2s, box-shadow 0.2s',
-              }}
-              onFocus={e => {
-                e.target.style.borderColor = 'rgba(34,211,238,0.5)'
-                e.target.style.boxShadow   = '0 0 0 3px rgba(34,211,238,0.1)'
-              }}
-              onBlur={e => {
-                e.target.style.borderColor = '#1e2535'
-                e.target.style.boxShadow   = 'none'
-              }}
             />
-          </div>
+          </FormField>
 
-          {/* Password */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-            <label style={{ fontSize: '0.875rem', color: '#718096' }}>Password</label>
-            <div style={{ position: 'relative' }}>
-              <input
+          <FormField label="Password">
+            <div className="relative">
+              <Input
                 type={showPass ? 'text' : 'password'}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
                 autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                style={{
-                  width: '100%', backgroundColor: '#181d28', border: '1px solid #1e2535',
-                  borderRadius: '0.75rem', padding: '0.75rem 3rem 0.75rem 1rem',
-                  color: '#e2e8f0', fontSize: '0.9375rem', outline: 'none',
-                  transition: 'border-color 0.2s, box-shadow 0.2s',
-                }}
-                onFocus={e => {
-                  e.target.style.borderColor = 'rgba(34,211,238,0.5)'
-                  e.target.style.boxShadow   = '0 0 0 3px rgba(34,211,238,0.1)'
-                }}
-                onBlur={e => {
-                  e.target.style.borderColor = '#1e2535'
-                  e.target.style.boxShadow   = 'none'
-                }}
               />
               <button
                 type="button"
                 onClick={() => setShowPass(p => !p)}
-                style={{
-                  position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)',
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  color: '#718096', padding: '0.25rem', display: 'flex', alignItems: 'center',
-                }}
+                className="absolute right-4 top-1/2 -translate-y-1/2
+                           text-text-muted hover:text-text cursor-pointer p-1"
               >
                 {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
-          </div>
+          </FormField>
 
-          {/* Submit */}
-          <button
+          <PrimaryButton
             type="submit"
             disabled={loading}
-            style={{
-              width: '100%', marginTop: '0.5rem',
-              backgroundColor: loading ? 'rgba(6,182,212,0.5)' : '#06b6d4',
-              color: '#0d0f14', fontWeight: 700, fontSize: '0.9375rem',
-              padding: '0.875rem 1.25rem', borderRadius: '0.75rem', border: 'none',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              boxShadow: '0 0 16px rgba(34,211,238,0.3)',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={e => { if (!loading) e.target.style.backgroundColor = '#22d3ee' }}
-            onMouseLeave={e => { if (!loading) e.target.style.backgroundColor = '#06b6d4' }}
+            className="w-full mt-2"
           >
-            {loading
-              ? 'Please wait...'
-              : mode === 'login' ? 'Sign In' : 'Create Account'}
-          </button>
+            {loading ? 'Please wait…' : mode === 'login' ? 'Sign In' : 'Create Account'}
+          </PrimaryButton>
         </form>
       </motion.div>
 
-      <p style={{
-        marginTop: '1.5rem', fontSize: '0.75rem', color: '#4a5568',
-        textAlign: 'center', maxWidth: '280px', position: 'relative', zIndex: 1,
-      }}>
-        By signing up you agree that math decides who owes what. No arguments. ⚡
+      <p className="mt-8 text-[10px] font-bold text-text-muted text-center max-w-[280px]
+                    uppercase tracking-wider z-10 leading-relaxed">
+        By signing up you agree that math decides who owes what. No arguments.
       </p>
     </div>
   )
