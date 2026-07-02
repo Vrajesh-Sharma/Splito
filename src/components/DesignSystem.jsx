@@ -1,7 +1,6 @@
 /**
  * DesignSystem.jsx — Reusable UI primitives only.
  * Layout (grids, columns, spacing) lives in each page directly.
- * No wrappers that force w-full, flex, or gap on parents.
  */
 
 import { ArrowLeft, CalendarDays } from 'lucide-react'
@@ -40,12 +39,14 @@ export function PageHeader({ title, subtitle, onBack, action, children }) {
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
 // Raised neumorphic surface. Clickable variant becomes a <button>.
-// Callers control width, padding, and height via className.
-export function Card({ children, className = '', onClick }) {
+// Callers control width, padding, and height via className or style prop.
+export function Card({ children, className = '', onClick, style, ...rest }) {
   const Tag = onClick ? 'button' : 'div'
   return (
     <Tag
       onClick={onClick}
+      style={style}
+      {...rest}
       className={`bg-bg rounded-2xl neu-extruded transition-all duration-200 text-left
         ${onClick
           ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-[8px_14px_22px_#c2cbd6,-8px_-8px_16px_#ffffff] active:shadow-neumorphic-inset active:scale-[0.98]'
@@ -132,13 +133,17 @@ export function Input({ className = '', startIcon, ...props }) {
   return (
     <div className="relative">
       {startIcon && (
-        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">
+        <span
+          className="absolute top-1/2 -translate-y-1/2 text-text-muted pointer-events-none flex items-center"
+          style={{ left: 16 }}
+        >
           {startIcon}
         </span>
       )}
       <input
         {...props}
-        className={`input-field ${startIcon ? 'pl-11' : ''} ${className}`}
+        style={startIcon ? { paddingLeft: 44 } : undefined}
+        className={`input-field ${className}`}
       />
     </div>
   )
@@ -158,14 +163,16 @@ export function DatePicker({ value, onChange, max, className = '', ...props }) {
     <div className="relative">
       <CalendarDays
         size={14}
-        className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none"
+        className="absolute top-1/2 -translate-y-1/2 text-text-muted pointer-events-none"
+        style={{ left: 16 }}
       />
       <input
         type="date"
         value={value}
         onChange={onChange}
         max={max}
-        className={`input-field pl-11 ${className}`}
+        className={`input-field ${className}`}
+        style={{ paddingLeft: 44 }}
         {...props}
       />
     </div>
@@ -179,7 +186,8 @@ export function Chip({ children, active, className = '', ...props }) {
     <button
       type="button"
       {...props}
-      className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold
+      style={{ padding: '9px 16px' }}
+      className={`inline-flex items-center gap-1.5 rounded-full text-xs font-bold
                   whitespace-nowrap transition-all duration-200 cursor-pointer
                   ${active
                     ? 'bg-primary text-white shadow-[inset_2px_2px_4px_rgba(0,0,0,0.15)] scale-[0.98]'

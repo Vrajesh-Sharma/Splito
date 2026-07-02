@@ -64,7 +64,8 @@ export default function AuthPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.08 }}
-        className="w-full max-w-[420px] z-10 card p-6 md:p-8"
+        className="w-full max-w-[420px] z-10 card"
+        style={{ padding: '28px' }}
       >
         {/* Tab switcher */}
         <div className="flex p-1.5 mb-6 rounded-2xl neu-inset bg-bg">

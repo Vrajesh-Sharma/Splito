@@ -16,9 +16,12 @@ export default function CategoryBadge({ category }) {
   const cat = CATEGORIES[category] ?? CATEGORIES.other
   const Icon = cat.icon
   return (
-    <span className={`inline-flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold border ${cat.color} shadow-[1px_1px_3px_rgba(0,0,0,0.05)] hover:scale-105 transition-all duration-200`}>
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full text-xs font-extrabold border ${cat.color} shadow-[1px_1px_3px_rgba(0,0,0,0.05)] hover:scale-105 transition-all duration-200`}
+      style={{ padding: '5px 12px' }}
+    >
       <Icon size={12} className="flex-shrink-0" />
-      <span className="whitespace-nowrap text-center leading-none">{cat.label}</span>
+      <span className="whitespace-nowrap leading-none">{cat.label}</span>
     </span>
   )
 }

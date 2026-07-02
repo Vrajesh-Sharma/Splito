@@ -62,7 +62,7 @@ export default function GroupDetailPage() {
     setSortOpen(true)
   }
 
-  // ── Group-not-found fallback ──────────────────────────────────────────────
+  // ── Group-not-found fallback 
   if (!group && groups.length > 0) {
     return (
       <Layout>
@@ -163,11 +163,13 @@ export default function GroupDetailPage() {
               </div>
             </Card>
 
-            {/* Settle Up CTA — sidebar on desktop */}
-            <PrimaryButton onClick={openSortOut} className="w-full">
-              <Zap size={15} className="fill-white flex-shrink-0" />
-              <span>Sort Out Debt</span>
-            </PrimaryButton>
+            {/* Settle Up CTA — sidebar on desktop only */}
+            <div className="hidden lg:flex">
+              <PrimaryButton onClick={openSortOut} className="w-full">
+                <Zap size={15} className="fill-white flex-shrink-0" />
+                <span>Sort Out Debt</span>
+              </PrimaryButton>
+            </div>
 
           </div>
 

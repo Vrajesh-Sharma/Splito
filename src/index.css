@@ -430,6 +430,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   top: auto;
 }
 
+/* Navbar responsive padding */
+.app-navbar-pad {
+  padding: 10px 16px;
+}
+
+@media (min-width: 768px) {
+  .app-navbar-pad {
+    padding: 14px 36px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-navbar-pad {
+    padding: 14px 40px;
+  }
+}
+
 @media (min-width: 768px) {
   .app-navbar {
     width: calc(100% - 48px);

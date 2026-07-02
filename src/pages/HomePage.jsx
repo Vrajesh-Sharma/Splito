@@ -48,7 +48,7 @@ export default function HomePage() {
 
           {/* Left — Stats card */}
           <div className="lg:col-span-4">
-            <Card className="relative p-7 h-full min-h-[160px]">
+            <Card className="relative h-full min-h-[160px]" style={{ padding: 28 }}>
               {/* Subtle primary glow */}
               <div
                 className="absolute inset-0 pointer-events-none opacity-20"
@@ -89,7 +89,7 @@ export default function HomePage() {
                 ))}
               </div>
             ) : groups.length === 0 ? (
-              <Card className="flex flex-col items-center justify-center gap-4 p-10 text-center card-inset min-h-[180px]">
+              <Card className="flex flex-col items-center justify-center gap-4 text-center card-inset min-h-[180px]" style={{ padding: 40 }}>
                 <div className="w-14 h-14 rounded-full neu-extruded flex items-center justify-center text-primary bg-bg">
                   <Users size={22} />
                 </div>
@@ -109,8 +109,9 @@ export default function HomePage() {
                   <button
                     key={group.id}
                     onClick={() => navigate(`/groups/${group.id}`)}
-                    className="w-full flex items-center gap-4 p-5 rounded-2xl neu-extruded bg-bg
+                    className="w-full flex items-center gap-4 rounded-2xl neu-extruded bg-bg
                                interactive-card text-left cursor-pointer border-none"
+                    style={{ padding: 20 }}
                   >
                     {/* Icon */}
                     <div className="w-11 h-11 rounded-xl neu-inset flex items-center justify-center flex-shrink-0 text-primary bg-bg">

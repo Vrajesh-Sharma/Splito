@@ -7,12 +7,14 @@ export default function BottomNav({ onAddExpense }) {
   const { profile, signOut } = useAuth()
 
   return (
-    <nav className="fixed left-1/2 -translate-x-1/2 z-40 
-                    bottom-4 md:bottom-auto
-                    md:top-5 lg:top-6 xl:top-7
-                    w-[calc(100%-32px)] md:w-[calc(100%-48px)] lg:w-[calc(100%-64px)] xl:w-[calc(100%-80px)]
-                    max-w-[1600px] 
-                    rounded-3xl md:rounded-2xl neu-extruded bg-bg/90 backdrop-blur-md px-4 py-2 md:px-8 md:py-3.5 flex items-center justify-between border-none md:shadow-neumorphic-extruded">
+    <nav
+      className="fixed left-1/2 -translate-x-1/2 z-40 
+                  bottom-4 md:bottom-auto
+                  md:top-5 lg:top-6 xl:top-7
+                  w-[calc(100%-32px)] md:w-[calc(100%-48px)] lg:w-[calc(100%-64px)] xl:w-[calc(100%-80px)]
+                  max-w-[1600px] app-navbar-pad
+                  rounded-3xl md:rounded-2xl neu-extruded bg-bg backdrop-blur-md flex items-center justify-between border-none md:shadow-neumorphic-extruded"
+    >
 
       {/* Brand logo - Left (Desktop only) */}
       <div className="hidden md:flex items-center gap-2">
@@ -69,7 +71,8 @@ export default function BottomNav({ onAddExpense }) {
         {onAddExpense && (
           <button
             onClick={onAddExpense}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-primary font-bold text-sm neu-extruded active:shadow-neumorphic-inset active:scale-95 transition-all duration-200 cursor-pointer"
+            className="flex items-center gap-2 rounded-xl text-primary font-bold text-sm neu-extruded active:shadow-neumorphic-inset active:scale-95 transition-all duration-200 cursor-pointer"
+            style={{ padding: '10px 20px' }}
           >
             <Plus size={16} strokeWidth={2.5} />
             <span>Add Expense</span>
