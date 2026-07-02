@@ -95,7 +95,7 @@ export default function AuthPage() {
                 type="text"
                 value={fullName}
                 onChange={e => setFullName(e.target.value)}
-                placeholder="Vrajesh Sharma"
+                placeholder="Narendra Modi"
                 autoComplete="name"
               />
             </FormField>
