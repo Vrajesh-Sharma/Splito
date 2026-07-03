@@ -200,6 +200,14 @@ export default function GroupDetailPage() {
               {/* Trailing spacer so last chip isn't flush against scroll edge */}
               <span className="flex-shrink-0 w-1" />
             </div>
+            
+            {/* Settle Up CTA — above ledger on mobile */}
+            <div className="lg:hidden">
+              <PrimaryButton onClick={openSortOut} className="w-full">
+                <Zap size={15} className="fill-white flex-shrink-0" />
+                <span>Sort Out Debt</span>
+              </PrimaryButton>
+            </div>
 
             {/* Ledger card */}
             <Card style={{ padding: 24 }}>
@@ -310,14 +318,6 @@ export default function GroupDetailPage() {
                 </div>
               )}
             </Card>
-
-            {/* Settle Up CTA — below ledger on mobile */}
-            <div className="lg:hidden">
-              <PrimaryButton onClick={openSortOut} className="w-full">
-                <Zap size={15} className="fill-white flex-shrink-0" />
-                <span>Sort Out Debt</span>
-              </PrimaryButton>
-            </div>
 
           </div>
         </div>
