@@ -13,16 +13,16 @@ function todayString() {
 }
 
 export default function ExpenseModal({ isOpen, onClose, groupId, members, onAdd, onUpdate, expense }) {
-  const { user }  = useAuth()
+  const { user } = useAuth()
   const isEditing = !!expense
 
-  const [title,       setTitle]       = useState('')
-  const [amount,      setAmount]      = useState('')
-  const [category,    setCategory]    = useState('other')
-  const [notes,       setNotes]       = useState('')
-  const [splitWith,   setSplitWith]   = useState([])
+  const [title, setTitle] = useState('')
+  const [amount, setAmount] = useState('')
+  const [category, setCategory] = useState('other')
+  const [notes, setNotes] = useState('')
+  const [splitWith, setSplitWith] = useState([])
   const [expenseDate, setExpenseDate] = useState(todayString())
-  const [loading,     setLoading]     = useState(false)
+  const [loading, setLoading] = useState(false)
 
   // Populate when editing
   useEffect(() => {
@@ -52,10 +52,10 @@ export default function ExpenseModal({ isOpen, onClose, groupId, members, onAdd,
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!title.trim())                                        return toast.error('Enter a title')
+    if (!title.trim()) return toast.error('Enter a title')
     if (!amount || isNaN(amount) || parseFloat(amount) <= 0) return toast.error('Enter a valid amount')
-    if (splitWith.length === 0)                              return toast.error('Select at least one member')
-    if (!expenseDate)                                         return toast.error('Select a date')
+    if (splitWith.length === 0) return toast.error('Select at least one member')
+    if (!expenseDate) return toast.error('Select a date')
 
     setLoading(true)
     if (isEditing) {
@@ -195,8 +195,8 @@ export default function ExpenseModal({ isOpen, onClose, groupId, members, onAdd,
                   className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 cursor-pointer
                               w-full text-left border-none
                               ${selected
-                                ? 'neu-inset bg-bg'
-                                : 'neu-extruded bg-bg hover:-translate-y-0.5'}`}
+                      ? 'neu-inset bg-bg'
+                      : 'neu-extruded bg-bg hover:-translate-y-0.5'}`}
                 >
                   <Avatar name={member.full_name} size="sm" />
                   <span className="flex-1 text-sm font-semibold text-text truncate">
@@ -204,8 +204,8 @@ export default function ExpenseModal({ isOpen, onClose, groupId, members, onAdd,
                   </span>
                   {selected
                     ? <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                        <Check size={11} className="text-white" strokeWidth={3} />
-                      </div>
+                      <Check size={11} className="text-white" strokeWidth={3} />
+                    </div>
                     : <div className="w-5 h-5 rounded-full neu-inset flex-shrink-0 bg-bg" />
                   }
                 </button>

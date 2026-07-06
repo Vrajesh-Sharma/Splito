@@ -43,11 +43,11 @@ export default function BottomNav({ onAddExpense }) {
         {onAddExpense && (
           <button
             onClick={onAddExpense}
-            className="flex flex-col items-center justify-center -mt-6 md:hidden active:scale-95 transition-transform"
+            className="flex flex-col items-center justify-center md:hidden active:scale-95 transition-transform"
             aria-label="Add Expense"
           >
-            <div className="w-14 h-14 rounded-full bg-bg flex items-center justify-center shadow-neumorphic-extruded active:shadow-neumorphic-inset text-primary">
-              <Plus size={24} strokeWidth={3} />
+            <div className="w-12 h-12 rounded-full bg-bg flex items-center justify-center shadow-neumorphic-extruded active:shadow-neumorphic-inset text-primary">
+              <Plus size={22} strokeWidth={3} />
             </div>
           </button>
         )}

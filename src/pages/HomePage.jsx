@@ -4,7 +4,7 @@ import { useGroups } from '../hooks/useGroups'
 import Layout from '../components/Layout'
 import Avatar from '../components/Avatar'
 import { PageHeader, Card, PrimaryButton, IconButton, TextButton } from '../components/DesignSystem'
-import { Users, LogOut, Zap, ArrowRight, TrendingUp } from 'lucide-react'
+import { Users, LogOut, Zap, ArrowRight, TrendingUp, Hand, WavesVerticalIcon, HeartHandshake } from 'lucide-react'
 
 export default function HomePage() {
   const { profile, signOut } = useAuth()
@@ -17,7 +17,11 @@ export default function HomePage() {
 
         {/* ── Page Header ── */}
         <PageHeader
-          title={`Hey, ${profile?.full_name?.split(' ')[0] || 'there'} 👋`}
+          title={
+            <span className="flex items-center gap-2">
+              Hey, {profile?.full_name?.split(' ')[0] || 'there'} <HeartHandshake size={28} className="text-pink-500" />
+            </span>
+          }
           subtitle="Ready to split some bills?"
           action={
             <div className="flex items-center gap-2 md:hidden">

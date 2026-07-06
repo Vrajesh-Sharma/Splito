@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Copy, Users, Zap, Filter, Pencil, Trash2, Receipt, LayoutGrid, ChevronDown } from 'lucide-react'
+import { Copy, Users, Zap, Filter, Pencil, Trash2, Receipt, LayoutGrid, ChevronDown, CalendarDays } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useGroups } from '../hooks/useGroups'
 import { useMembers } from '../hooks/useMembers'
@@ -15,7 +15,7 @@ import toast from 'react-hot-toast'
 import { PageHeader, Card, PrimaryButton, SecondaryButton, Chip } from '../components/DesignSystem'
 
 export default function GroupDetailPage() {
-  const { id }   = useParams()
+  const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
   const { groups } = useGroups()
@@ -28,11 +28,11 @@ export default function GroupDetailPage() {
 
   const group = groups.find(g => g.id === id)
 
-  const [addOpen,     setAddOpen]     = useState(false)
+  const [addOpen, setAddOpen] = useState(false)
   const [editExpense, setEditExpense] = useState(null)
-  const [sortOpen,    setSortOpen]    = useState(false)
-  const [filter,      setFilter]      = useState('all')
-  const [settlement,  setSettlement]  = useState(null)
+  const [sortOpen, setSortOpen] = useState(false)
+  const [filter, setFilter] = useState('all')
+  const [settlement, setSettlement] = useState(null)
 
   // Per-member net balances
   const memberBalances = useMemo(() => {
@@ -50,7 +50,7 @@ export default function GroupDetailPage() {
   const filteredExpenses = filter === 'all' ? expenses : expenses.filter(e => e.category === filter)
 
   const totalSpent = expenses.reduce((s, e) => s + parseFloat(e.amount), 0)
-  const mySpent    = expenses.filter(e => e.paid_by === user?.id).reduce((s, e) => s + parseFloat(e.amount), 0)
+  const mySpent = expenses.filter(e => e.paid_by === user?.id).reduce((s, e) => s + parseFloat(e.amount), 0)
 
   function copyCode() {
     navigator.clipboard.writeText(group?.invite_code ?? '')
@@ -110,9 +110,9 @@ export default function GroupDetailPage() {
             {/* Stats row — 3 equal cards */}
             <div className="grid grid-cols-3 gap-3">
               {[
-                { label: 'Total',    value: `₹${totalSpent.toFixed(0)}`, primary: false },
-                { label: 'You Paid', value: `₹${mySpent.toFixed(0)}`,   primary: true  },
-                { label: 'Members',  value: members.length,               primary: false },
+                { label: 'Total', value: `₹${totalSpent.toFixed(0)}`, primary: false },
+                { label: 'You Paid', value: `₹${mySpent.toFixed(0)}`, primary: true },
+                { label: 'Members', value: members.length, primary: false },
               ].map((stat, i) => (
                 <Card key={i} className="flex flex-col items-center justify-center text-center" style={{ padding: 16 }}>
                   <p className={`font-display font-black text-base tabular-nums leading-tight
@@ -137,28 +137,28 @@ export default function GroupDetailPage() {
               <div className="flex flex-col">
                 {membersLoading
                   ? [1, 2, 3].map(i => (
-                      <div key={i} className="flex items-center gap-3 py-2.5 border-b border-slate-200/20 last:border-0">
-                        <div className="skeleton w-7 h-7 rounded-full" />
-                        <div className="skeleton h-3 w-20 rounded" />
-                        <div className="ml-auto skeleton h-3 w-12 rounded" />
-                      </div>
-                    ))
+                    <div key={i} className="flex items-center gap-3 py-2.5 border-b border-slate-200/20 last:border-0">
+                      <div className="skeleton w-7 h-7 rounded-full" />
+                      <div className="skeleton h-3 w-20 rounded" />
+                      <div className="ml-auto skeleton h-3 w-12 rounded" />
+                    </div>
+                  ))
                   : members.map(m => {
-                      const bal = memberBalances[m.id] || 0
-                      const pos = bal > 0.01
-                      const neg = bal < -0.01
-                      return (
-                        <div key={m.id} className="flex items-center gap-3 py-2.5 border-b border-slate-200/20 last:border-0">
-                          <Avatar name={m.full_name} size="sm" />
-                          <span className="text-sm font-semibold text-text truncate flex-1" title={m.full_name}>
-                            {m.full_name}
-                          </span>
-                          <span className={`text-xs font-bold font-mono tabular-nums flex-shrink-0 ${pos ? 'text-primary' : neg ? 'text-danger' : 'text-text-muted'}`}>
-                            {pos ? '+' : ''}₹{Math.abs(bal).toFixed(2)}
-                          </span>
-                        </div>
-                      )
-                    })
+                    const bal = memberBalances[m.id] || 0
+                    const pos = bal > 0.01
+                    const neg = bal < -0.01
+                    return (
+                      <div key={m.id} className="flex items-center gap-3 py-2.5 border-b border-slate-200/20 last:border-0">
+                        <Avatar name={m.full_name} size="sm" />
+                        <span className="text-sm font-semibold text-text truncate flex-1" title={m.full_name}>
+                          {m.full_name}
+                        </span>
+                        <span className={`text-xs font-bold font-mono tabular-nums flex-shrink-0 ${pos ? 'text-primary' : neg ? 'text-danger' : 'text-text-muted'}`}>
+                          {pos ? '+' : ''}₹{Math.abs(bal).toFixed(2)}
+                        </span>
+                      </div>
+                    )
+                  })
                 }
               </div>
             </Card>
@@ -200,7 +200,7 @@ export default function GroupDetailPage() {
               {/* Trailing spacer so last chip isn't flush against scroll edge */}
               <span className="flex-shrink-0 w-1" />
             </div>
-            
+
             {/* Settle Up CTA — above ledger on mobile */}
             <div className="lg:hidden">
               <PrimaryButton onClick={openSortOut} className="w-full">
@@ -239,8 +239,8 @@ export default function GroupDetailPage() {
               ) : (
                 <div className="flex flex-col gap-4">
                   {filteredExpenses.map(exp => {
-                    const isMine    = exp.paid_by === user?.id
-                    const CatIcon   = CATEGORIES[exp.category]?.icon ?? CATEGORIES.other.icon
+                    const isMine = exp.paid_by === user?.id
+                    const CatIcon = CATEGORIES[exp.category]?.icon ?? CATEGORIES.other.icon
                     const dateLabel = exp.expense_date
                       ? format(new Date(exp.expense_date + 'T00:00:00'), 'dd MMM yyyy')
                       : format(new Date(exp.created_at), 'dd MMM yyyy')
@@ -263,10 +263,16 @@ export default function GroupDetailPage() {
                           <p className="font-extrabold text-text text-sm md:text-base leading-snug break-words">
                             {exp.title}
                           </p>
-                          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1.5 text-xs text-text-muted font-semibold leading-relaxed">
-                            <span className="text-primary font-bold">• Paid by {paidByName}</span>
-                            <span>• {splitCount} member{splitCount !== 1 ? 's' : ''}</span>
-                            <span>• {dateLabel}</span>
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-2 text-[11px] text-text-muted font-bold leading-relaxed tracking-wide">
+                            <span className="text-primary flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-primary" /> Paid by {paidByName}
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <Users size={12} className="opacity-75" /> {splitCount} member{splitCount !== 1 ? 's' : ''}
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <CalendarDays size={12} className="opacity-75" /> {dateLabel}
+                            </span>
                           </div>
                           {/* Category badge — small, inline */}
                           <div className="mt-2">

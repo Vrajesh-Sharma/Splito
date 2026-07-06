@@ -92,8 +92,7 @@ export default function BaseModal({
                     className="bg-slate-200/60"
                     style={{ height: 1, margin: '0 28px' }}
                   />
-                  {/* 20px side padding keeps button away from modal edges */}
-                  <div style={{ padding: '16px 20px 20px' }}>
+                  <div style={{ padding: '24px 28px 28px' }}>
                     {footer}
                   </div>
                 </div>

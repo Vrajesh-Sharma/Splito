@@ -7,18 +7,18 @@ import { PrimaryButton, FormField, Input } from '../components/DesignSystem'
 
 export default function AuthPage() {
   const { signIn, signUp } = useAuth()
-  const [mode,     setMode]     = useState('login')
+  const [mode, setMode] = useState('login')
   const [fullName, setFullName] = useState('')
-  const [email,    setEmail]    = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPass, setShowPass] = useState(false)
-  const [loading,  setLoading]  = useState(false)
+  const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e) {
     e.preventDefault()
     if (mode === 'signup' && !fullName.trim()) return toast.error('Enter your full name')
-    if (!email.trim())  return toast.error('Enter your email')
-    if (!password)      return toast.error('Enter your password')
+    if (!email.trim()) return toast.error('Enter your email')
+    if (!password) return toast.error('Enter your password')
     if (password.length < 6) return toast.error('Password must be at least 6 characters')
 
     setLoading(true)
@@ -70,7 +70,7 @@ export default function AuthPage() {
         {/* Tab switcher */}
         <div className="flex p-1.5 mb-6 rounded-2xl neu-inset bg-bg">
           {[
-            { key: 'login',  label: 'Sign In' },
+            { key: 'login', label: 'Sign In' },
             { key: 'signup', label: 'Sign Up' },
           ].map(tab => (
             <button
@@ -81,8 +81,8 @@ export default function AuthPage() {
                           transition-all duration-200 cursor-pointer rounded-xl border-none
                           flex items-center justify-center min-h-[40px]
                           ${mode === tab.key
-                            ? 'neu-extruded text-primary'
-                            : 'text-text-muted hover:text-text bg-transparent'}`}
+                  ? 'neu-extruded text-primary'
+                  : 'text-text-muted hover:text-text bg-transparent'}`}
             >
               {tab.label}
             </button>

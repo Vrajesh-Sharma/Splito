@@ -17,11 +17,11 @@ export default function CategoryBadge({ category }) {
   const Icon = cat.icon
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full text-xs font-extrabold border ${cat.color} shadow-[1px_1px_3px_rgba(0,0,0,0.05)] hover:scale-105 transition-all duration-200`}
-      style={{ padding: '5px 12px' }}
+      className={`inline-flex items-center justify-center gap-1.5 rounded-full text-xs font-extrabold border ${cat.color} shadow-[1px_1px_3px_rgba(0,0,0,0.05)] hover:scale-105 transition-all duration-200`}
+      style={{ padding: '6px 12px', minHeight: '28px', lineHeight: 1.2 }}
     >
       <Icon size={12} className="flex-shrink-0" />
-      <span className="whitespace-nowrap leading-none">{cat.label}</span>
+      <span className="whitespace-nowrap leading-tight">{cat.label}</span>
     </span>
   )
 }

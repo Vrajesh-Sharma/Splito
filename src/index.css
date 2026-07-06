@@ -63,8 +63,6 @@
 *::before,
 *::after {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 html {
@@ -138,7 +136,7 @@ textarea {
   cursor: pointer;
   text-align: center;
   box-shadow: 4px 4px 10px rgba(101, 163, 13, 0.25), 8px 8px 16px #d1d9e6, -8px -8px 16px #ffffff;
-  transition: background-color 0.25s ease, color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
   font-size: 0.875rem;
   min-height: 52px;
   line-height: 1.25;
@@ -152,8 +150,8 @@ textarea {
 }
 
 .btn-primary:active:not(:disabled) {
-  transform: scale(0.98);
-  box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.15);
+  transform: scale(0.97) translateY(2px);
+  box-shadow: inset 4px 4px 10px rgba(0, 0, 0, 0.15), inset -2px -2px 5px rgba(255, 255, 255, 0.1);
 }
 
 .btn-primary:disabled {
@@ -178,7 +176,7 @@ textarea {
   cursor: pointer;
   text-align: center;
   box-shadow: 8px 8px 16px #d1d9e6, -8px -8px 16px #ffffff;
-  transition: background-color 0.25s ease, color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
   font-size: 0.875rem;
   min-height: 52px;
   line-height: 1.25;
@@ -191,8 +189,8 @@ textarea {
 }
 
 .btn-secondary:active:not(:disabled) {
-  box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff;
-  transform: scale(0.98);
+  box-shadow: inset 4px 4px 10px #d1d9e6, inset -4px -4px 10px #ffffff;
+  transform: scale(0.97) translateY(2px);
 }
 
 .btn-secondary:disabled {
@@ -212,7 +210,7 @@ textarea {
   border-radius: 1rem;
   border: none;
   cursor: pointer;
-  transition: background-color 0.25s ease, color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .btn-ghost:hover:not(:disabled) {
@@ -313,7 +311,7 @@ textarea {
 }
 
 .interactive-card {
-  transition: transform 200ms ease, box-shadow 200ms ease;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .interactive-card:hover:not(:disabled) {
@@ -322,8 +320,8 @@ textarea {
 }
 
 .interactive-card:active:not(:disabled) {
-  transform: scale(0.98);
-  box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff;
+  transform: scale(0.98) translateY(1px);
+  box-shadow: inset 3px 3px 6px #d1d9e6, inset -3px -3px 6px #ffffff;
 }
 
 /* Custom Date Input indicator hiding and full-width click behavior */

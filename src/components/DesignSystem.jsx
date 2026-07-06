@@ -163,7 +163,7 @@ export function DatePicker({ value, onChange, max, className = '', ...props }) {
     <div className="relative">
       <CalendarDays
         size={14}
-        className="absolute top-1/2 -translate-y-1/2 text-text-muted pointer-events-none"
+        className="absolute top-1/2 -translate-y-1/2 text-text-muted pointer-events-none z-10"
         style={{ left: 16 }}
       />
       <input
@@ -186,13 +186,13 @@ export function Chip({ children, active, className = '', ...props }) {
     <button
       type="button"
       {...props}
-      style={{ padding: '9px 16px' }}
-      className={`inline-flex items-center gap-1.5 rounded-full text-xs font-bold
-                  whitespace-nowrap transition-all duration-200 cursor-pointer
+      style={{ padding: '8px 16px', minHeight: '40px', lineHeight: 1.2, ...props.style }}
+      className={`inline-flex items-center justify-center gap-1.5 rounded-full text-xs font-bold
+                  whitespace-nowrap transition-all duration-200 cursor-pointer flex-shrink-0
                   ${active
-                    ? 'bg-primary text-white shadow-[inset_2px_2px_4px_rgba(0,0,0,0.15)] scale-[0.98]'
-                    : 'neu-extruded text-text-muted hover:text-text bg-bg active:shadow-neumorphic-inset active:scale-95'
-                  } ${className}`}
+          ? 'bg-primary text-white shadow-[inset_2px_2px_4px_rgba(0,0,0,0.15)] scale-[0.98]'
+          : 'bg-bg shadow-[1px_1px_6px_#d1d9e6,-1px_-1px_6px_#ffffff] text-text-muted hover:text-text active:scale-[0.97]'
+        } ${className}`}
     >
       {children}
     </button>
