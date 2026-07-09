@@ -8,6 +8,7 @@ export function useExpenses(groupId) {
   const { user } = useAuth()
 
   const [expenses,    setExpenses]    = useState([])
+  const [allExpenses, setAllExpenses] = useState([])
   const [loading,     setLoading]     = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [hasMore,     setHasMore]     = useState(false)
@@ -16,6 +17,7 @@ export function useExpenses(groupId) {
   useEffect(() => {
     if (!groupId) return
     fetchExpenses(0, true)
+    fetchAllExpenses()
   }, [groupId])
 
   async function fetchExpenses(pageIndex = 0, reset = false) {
@@ -48,6 +50,19 @@ export function useExpenses(groupId) {
     else setLoadingMore(false)
   }
 
+  async function fetchAllExpenses() {
+    if (!groupId) return
+    const { data } = await supabase
+      .from('expenses')
+      .select(`
+        paid_by,
+        amount,
+        expense_splits(user_id, share_amount)
+      `)
+      .eq('group_id', groupId)
+    setAllExpenses(data ?? [])
+  }
+
   async function loadMore() {
     await fetchExpenses(page + 1, false)
   }
@@ -76,7 +91,10 @@ export function useExpenses(groupId) {
       share_amount: share,
     }))
     await supabase.from('expense_splits').insert(splits)
-    await fetchExpenses(0, true)
+    await Promise.all([
+      fetchExpenses(0, true),
+      fetchAllExpenses(),
+    ])
     return { data: expense }
   }
 
@@ -108,20 +126,26 @@ export function useExpenses(groupId) {
 
     if (splitsError) return { error: splitsError }
 
-    await fetchExpenses(0, true)
+    await Promise.all([
+      fetchExpenses(0, true),
+      fetchAllExpenses(),
+    ])
     return { data: true }
     }
 
   async function deleteExpense(id) {
     await supabase.from('expenses').delete().eq('id', id)
-    await fetchExpenses(0, true)
+    await Promise.all([
+      fetchExpenses(0, true),
+      fetchAllExpenses(),
+    ])
   }
 
   function calculateSettlement(members) {
     const balances = {}
     members.forEach(m => { balances[m.id] = { name: m.full_name, net: 0 } })
 
-    expenses.forEach(exp => {
+    allExpenses.forEach(exp => {
       if (balances[exp.paid_by]) balances[exp.paid_by].net += parseFloat(exp.amount)
       exp.expense_splits?.forEach(split => {
         if (balances[split.user_id]) balances[split.user_id].net -= parseFloat(split.share_amount)
@@ -152,9 +176,12 @@ export function useExpenses(groupId) {
   }
 
   return {
-    expenses, loading, loadingMore, hasMore,
+    expenses, allExpenses, loading, loadingMore, hasMore,
     addExpense, updateExpense, deleteExpense,
     calculateSettlement, loadMore,
-    refetch: () => fetchExpenses(0, true),
+    refetch: () => {
+      fetchExpenses(0, true)
+      fetchAllExpenses()
+    },
   }
 }

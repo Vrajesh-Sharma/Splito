@@ -21,7 +21,7 @@ export default function GroupDetailPage() {
   const { groups } = useGroups()
   const { members, loading: membersLoading } = useMembers(id)
   const {
-    expenses, loading: expLoading, loadingMore, hasMore,
+    expenses, allExpenses, loading: expLoading, loadingMore, hasMore,
     addExpense, updateExpense, deleteExpense,
     calculateSettlement, loadMore,
   } = useExpenses(id)
@@ -38,19 +38,19 @@ export default function GroupDetailPage() {
   const memberBalances = useMemo(() => {
     if (!members?.length) return {}
     const bals = Object.fromEntries(members.map(m => [m.id, 0]))
-    expenses.forEach(exp => {
+    allExpenses.forEach(exp => {
       if (bals[exp.paid_by] !== undefined) bals[exp.paid_by] += parseFloat(exp.amount || 0)
       exp.expense_splits?.forEach(s => {
         if (bals[s.user_id] !== undefined) bals[s.user_id] -= parseFloat(s.share_amount || 0)
       })
     })
     return bals
-  }, [members, expenses])
+  }, [members, allExpenses])
 
   const filteredExpenses = filter === 'all' ? expenses : expenses.filter(e => e.category === filter)
 
-  const totalSpent = expenses.reduce((s, e) => s + parseFloat(e.amount), 0)
-  const mySpent = expenses.filter(e => e.paid_by === user?.id).reduce((s, e) => s + parseFloat(e.amount), 0)
+  const totalSpent = allExpenses.reduce((s, e) => s + parseFloat(e.amount), 0)
+  const mySpent = allExpenses.filter(e => e.paid_by === user?.id).reduce((s, e) => s + parseFloat(e.amount), 0)
 
   function copyCode() {
     navigator.clipboard.writeText(group?.invite_code ?? '')
