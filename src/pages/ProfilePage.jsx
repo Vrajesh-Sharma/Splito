@@ -4,60 +4,122 @@ import { useAuth } from '../context/AuthContext'
 import Layout from '../components/Layout'
 import Avatar from '../components/Avatar'
 import { PageHeader, Card, PrimaryButton, FormField, Input } from '../components/DesignSystem'
-import { Sparkles, Save, Globe, RefreshCw } from 'lucide-react'
+import { Save, Search, Type, Shuffle, Globe } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-const PRESET_AVATARS = [
-  { id: 'fun1', label: 'Snuggles', url: 'https://api.dicebear.com/10.x/fun-emoji/svg?seed=Snuggles' },
-  { id: 'fun2', label: 'Sassy', url: 'https://api.dicebear.com/10.x/fun-emoji/svg?seed=Sassy' },
-  { id: 'fun3', label: 'Oscar', url: 'https://api.dicebear.com/10.x/fun-emoji/svg?seed=Oscar' },
-  { id: 'fun4', label: 'Scooter', url: 'https://api.dicebear.com/10.x/fun-emoji/svg?seed=Scooter' },
-  { id: 'lor1', label: 'Bella', url: 'https://api.dicebear.com/10.x/lorelei/svg?seed=Bella' },
-  { id: 'lor2', label: 'Sophie', url: 'https://api.dicebear.com/10.x/lorelei/svg?seed=Sophie' },
-  { id: 'lor3', label: 'Milo', url: 'https://api.dicebear.com/10.x/lorelei/svg?seed=Milo' },
-  { id: 'bot1', label: 'Buster', url: 'https://api.dicebear.com/10.x/bottts/svg?seed=Buster' },
-  { id: 'bot2', label: 'Aero', url: 'https://api.dicebear.com/10.x/bottts/svg?seed=Aero' },
-  { id: 'adv1', label: 'Felix', url: 'https://api.dicebear.com/10.x/adventurer/svg?seed=Felix' },
-  { id: 'adv2', label: 'Aneka', url: 'https://api.dicebear.com/10.x/adventurer/svg?seed=Aneka' },
-  { id: 'adv3', label: 'Ruby', url: 'https://api.dicebear.com/10.x/adventurer/svg?seed=Ruby' },
+// All official Dicebear 10.x styles
+const DICEBEAR_STYLES = [
+  { id: 'adventurer', label: 'Adventurer' },
+  { id: 'adventurer-neutral', label: 'Adventurer Neutral' },
+  { id: 'avataaars', label: 'Avataaars' },
+  { id: 'avataaars-neutral', label: 'Avataaars Neutral' },
+  { id: 'big-ears', label: 'Big Ears' },
+  { id: 'big-ears-neutral', label: 'Big Ears Neutral' },
+  { id: 'big-smile', label: 'Big Smile' },
+  { id: 'bottts', label: 'Bottts' },
+  { id: 'bottts-neutral', label: 'Bottts Neutral' },
+  { id: 'croodles', label: 'Croodles' },
+  { id: 'croodles-neutral', label: 'Croodles Neutral' },
+  { id: 'dylan', label: 'Dylan' },
+  { id: 'fun-emoji', label: 'Fun Emoji' },
+  { id: 'glass', label: 'Glass' },
+  { id: 'icons', label: 'Icons' },
+  { id: 'identicon', label: 'Identicon' },
+  { id: 'initials', label: 'Initials' },
+  { id: 'lorelei', label: 'Lorelei' },
+  { id: 'lorelei-neutral', label: 'Lorelei Neutral' },
+  { id: 'micah', label: 'Micah' },
+  { id: 'miniavs', label: 'Miniavs' },
+  { id: 'open-peeps', label: 'Open Peeps' },
+  { id: 'personas', label: 'Personas' },
+  { id: 'pixel-art', label: 'Pixel Art' },
+  { id: 'pixel-art-neutral', label: 'Pixel Art Neutral' },
+  { id: 'rings', label: 'Rings' },
+  { id: 'shapes', label: 'Shapes' },
+  { id: 'thumbs', label: 'Thumbs' },
 ]
+
+// Helper to generate a batch of random cool seeds
+function generateRandomSeeds(count = 8) {
+  const adjectives = ['Happy', 'Cool', 'Sassy', 'Brave', 'Sunny', 'Clever', 'Wild', 'Chill', 'Jolly', 'Fancy', 'Swift', 'Gentle']
+  const nouns = ['Panda', 'Tiger', 'Koala', 'Fox', 'Otter', 'Badger', 'Sloth', 'Rabbit', 'Eagle', 'Owl', 'Dolphin', 'Cat']
+  const seeds = []
+  for (let i = 0; i < count; i++) {
+    const adj = adjectives[Math.floor(Math.random() * adjectives.length)]
+    const noun = nouns[Math.floor(Math.random() * nouns.length)]
+    const num = Math.floor(Math.random() * 100)
+    seeds.push(`${adj}${noun}${num}`)
+  }
+  return seeds
+}
 
 export default function ProfilePage() {
   const { profile, updateProfile } = useAuth()
   const navigate = useNavigate()
 
   const [fullName, setFullName] = useState('')
-  const [selectedUrl, setSelectedUrl] = useState('')
+  const [selectedStyle, setSelectedStyle] = useState('fun-emoji')
+  const [avatarMode, setAvatarMode] = useState('dynamic') // 'dynamic', 'preset', 'custom-seed'
+  const [customSeed, setCustomSeed] = useState('')
+  const [randomSeeds, setRandomSeeds] = useState([])
+  const [selectedPresetSeed, setSelectedPresetSeed] = useState('')
   const [customUrl, setCustomUrl] = useState('')
   const [isCustom, setIsCustom] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
-  // Initialize form state
+  // Generate initial random seeds on mount
+  useEffect(() => {
+    setRandomSeeds(generateRandomSeeds(8))
+  }, [])
+
+  // Initialize form state from loaded profile
   useEffect(() => {
     if (profile) {
       setFullName(profile.full_name ?? '')
       const url = profile.avatar_url ?? ''
       
-      const isPreset = PRESET_AVATARS.some(p => p.url === url)
       if (url === '') {
-        // Dynamic name-based
-        setSelectedUrl('')
-        setCustomUrl('')
+        setSelectedStyle('fun-emoji')
+        setAvatarMode('dynamic')
         setIsCustom(false)
-      } else if (isPreset) {
-        setSelectedUrl(url)
         setCustomUrl('')
-        setIsCustom(false)
       } else {
-        setSelectedUrl(url)
-        setCustomUrl(url)
-        setIsCustom(true)
+        const dicebearRegex = /^https:\/\/api\.dicebear\.com\/10\.x\/([^/]+)\/svg\?seed=(.+)$/
+        const match = url.match(dicebearRegex)
+        
+        if (match) {
+          const style = match[1]
+          const seed = decodeURIComponent(match[2])
+          setSelectedStyle(style)
+          setIsCustom(false)
+          
+          if (seed === (profile.full_name || '')) {
+            setAvatarMode('dynamic')
+          } else {
+            setAvatarMode('custom-seed')
+            setCustomSeed(seed)
+          }
+        } else {
+          setIsCustom(true)
+          setCustomUrl(url)
+        }
       }
     }
   }, [profile])
 
+  const activePresetSeed = selectedPresetSeed || (randomSeeds.length > 0 ? randomSeeds[0] : 'default')
+
   // Compute live preview avatar URL
-  const previewAvatarUrl = isCustom ? customUrl : selectedUrl
+  const previewAvatarUrl = isCustom 
+    ? customUrl 
+    : `https://api.dicebear.com/10.x/${selectedStyle}/svg?seed=${encodeURIComponent(
+        avatarMode === 'dynamic' 
+          ? (fullName.trim() || 'default') 
+          : avatarMode === 'preset' 
+            ? activePresetSeed 
+            : (customSeed.trim() || 'default')
+      )}`
 
   async function handleSave(e) {
     e.preventDefault()
@@ -66,11 +128,23 @@ export default function ProfilePage() {
     }
 
     setSaving(true)
-    const finalUrl = isCustom ? customUrl.trim() : selectedUrl
+    let finalUrl = null
+
+    if (isCustom) {
+      finalUrl = customUrl.trim() || null
+    } else {
+      if (avatarMode === 'dynamic') {
+        finalUrl = `https://api.dicebear.com/10.x/${selectedStyle}/svg?seed=${encodeURIComponent(fullName.trim())}`
+      } else if (avatarMode === 'preset') {
+        finalUrl = `https://api.dicebear.com/10.x/${selectedStyle}/svg?seed=${encodeURIComponent(activePresetSeed)}`
+      } else {
+        finalUrl = `https://api.dicebear.com/10.x/${selectedStyle}/svg?seed=${encodeURIComponent(customSeed.trim() || 'default')}`
+      }
+    }
 
     const { error } = await updateProfile({
       full_name: fullName.trim(),
-      avatar_url: finalUrl || null,
+      avatar_url: finalUrl,
     })
 
     setSaving(false)
@@ -80,6 +154,10 @@ export default function ProfilePage() {
       toast.success('Profile updated successfully!')
     }
   }
+
+  const filteredStyles = DICEBEAR_STYLES.filter(style =>
+    style.label.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   return (
     <Layout>
@@ -110,11 +188,6 @@ export default function ProfilePage() {
                   url={previewAvatarUrl} 
                   size="xl" 
                 />
-                {!previewAvatarUrl && (
-                  <div className="absolute -top-1 -right-1 bg-primary text-white p-1 rounded-full shadow-lg" title="Dynamic Dicebear seed avatar">
-                    <Sparkles size={12} className="animate-pulse" />
-                  </div>
-                )}
               </div>
 
               <div className="mt-2 min-w-0 w-full">
@@ -125,7 +198,9 @@ export default function ProfilePage() {
                   {profile?.email}
                 </p>
                 <div className="inline-flex items-center gap-1.5 mt-2 bg-primary/10 border border-primary/20 rounded-full px-2.5 py-0.5 text-[10px] font-extrabold text-primary uppercase">
-                  {previewAvatarUrl ? (isCustom ? 'Custom Avatar' : 'Preset Avatar') : 'Dynamic Seed Avatar'}
+                  {isCustom 
+                    ? 'Custom URL' 
+                    : `${DICEBEAR_STYLES.find(s => s.id === selectedStyle)?.label || selectedStyle} (${avatarMode})`}
                 </div>
               </div>
             </Card>
@@ -157,100 +232,192 @@ export default function ProfilePage() {
             </h2>
 
             <Card className="flex flex-col gap-6 p-6">
-              {/* Standard presets / type tabs */}
+              {/* Tabs */}
               <div className="flex p-1.5 rounded-2xl neu-inset bg-bg">
                 <button
                   type="button"
                   onClick={() => setIsCustom(false)}
-                  className={`flex-1 py-2 text-xs font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer rounded-xl border-none flex items-center justify-center gap-1.5
+                  className={`flex-1 py-2 text-xs font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer rounded-xl border-none flex items-center justify-center
                     ${!isCustom ? 'neu-extruded text-primary bg-bg font-extrabold' : 'text-text-muted hover:text-text bg-transparent font-bold'}`}
                 >
-                  <Sparkles size={13} />
-                  <span>Presets & Dynamic</span>
+                  <span>Dicebear Styles</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsCustom(true)}
-                  className={`flex-1 py-2 text-xs font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer rounded-xl border-none flex items-center justify-center gap-1.5
+                  className={`flex-1 py-2 text-xs font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer rounded-xl border-none flex items-center justify-center
                     ${isCustom ? 'neu-extruded text-primary bg-bg font-extrabold' : 'text-text-muted hover:text-text bg-transparent font-bold'}`}
                 >
-                  <Globe size={13} />
                   <span>Custom URL</span>
                 </button>
               </div>
 
               {!isCustom ? (
                 <div className="flex flex-col gap-5">
-                  {/* Dynamic Option */}
-                  <div>
-                    <h3 className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-2">
-                      Dynamic Choice
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedUrl('')}
-                      className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 border-none cursor-pointer text-left
-                        ${selectedUrl === ''
-                          ? 'neu-inset bg-bg border-primary/20'
-                          : 'neu-extruded bg-bg hover:-translate-y-0.5'}`}
-                    >
-                      <div className="relative">
-                        <Avatar name={fullName || 'default'} url={null} size="md" />
-                        <div className="absolute -top-1 -right-1 bg-primary text-white p-0.5 rounded-full">
-                          <RefreshCw size={10} className="animate-spin" style={{ animationDuration: '6s' }} />
-                        </div>
+                  {/* Style Categories Grid */}
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-[11px] font-bold text-text-muted uppercase tracking-wider pl-1">
+                        Choose Style Category ({filteredStyles.length})
+                      </h3>
+                      <div className="w-44 scale-90 origin-right">
+                        <Input
+                          value={searchQuery}
+                          onChange={e => setSearchQuery(e.target.value)}
+                          placeholder="Search styles..."
+                          startIcon={<Search size={13} />}
+                        />
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-extrabold text-text">Name-Based Avatar</p>
-                        <p className="text-xs text-text-muted mt-0.5">
-                          Generates a fun character dynamically based on your name.
-                        </p>
-                      </div>
-                      {selectedUrl === '' && (
-                        <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                          <span className="w-2 h-2 rounded-full bg-white" />
-                        </div>
-                      )}
-                    </button>
-                  </div>
+                    </div>
 
-                  {/* Preset Grid */}
-                  <div>
-                    <h3 className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-3">
-                      Preset Designs
-                    </h3>
-                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
-                      {PRESET_AVATARS.map(preset => {
-                        const isSelected = selectedUrl === preset.url
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 max-h-56 overflow-y-auto p-2 rounded-2xl neu-inset bg-bg">
+                      {filteredStyles.map(style => {
+                        const isSelected = selectedStyle === style.id
                         return (
                           <button
-                            key={preset.id}
+                            key={style.id}
                             type="button"
-                            onClick={() => setSelectedUrl(preset.url)}
-                            className={`relative aspect-square rounded-2xl flex items-center justify-center p-1 cursor-pointer transition-all duration-200 border-none bg-bg
+                            onClick={() => setSelectedStyle(style.id)}
+                            className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border-none transition-all duration-200 cursor-pointer text-left w-full
                               ${isSelected 
-                                ? 'neu-inset scale-95 ring-2 ring-primary ring-offset-1' 
-                                : 'neu-extruded hover:-translate-y-0.5'}`}
-                            title={preset.label}
+                                ? 'neu-inset bg-bg text-primary scale-95 ring-2 ring-primary/40' 
+                                : 'neu-extruded bg-bg hover:-translate-y-0.5 text-text-muted hover:text-text'}`}
                           >
-                            <img 
-                              src={preset.url} 
-                              alt={preset.label} 
-                              className="w-full h-full object-contain rounded-xl"
-                            />
-                            {isSelected && (
-                              <div className="absolute -top-1 -right-1 bg-primary text-white w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black">
-                                ✓
-                              </div>
-                            )}
+                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-white/80 flex items-center justify-center border border-[#d1d9e6]/50">
+                              <img 
+                                src={`https://api.dicebear.com/10.x/${style.id}/svg?seed=${encodeURIComponent(fullName.trim() || 'User')}`} 
+                                alt={style.label} 
+                                className="w-full h-full object-contain"
+                                loading="lazy"
+                              />
+                            </div>
+                            <span className="text-[9px] font-bold text-center truncate w-full leading-tight">
+                              {style.label}
+                            </span>
                           </button>
                         )
                       })}
                     </div>
                   </div>
+
+                  {/* Seed / Flavor Configuration */}
+                  <div className="flex flex-col gap-4 pt-4 border-t border-[#d1d9e6]/30">
+                    <h3 className="text-[11px] font-bold text-text-muted uppercase tracking-wider pl-1">
+                      Configure Avatar Seed
+                    </h3>
+
+                    <div className="flex p-1.5 rounded-2xl neu-inset bg-bg">
+                      <button
+                        type="button"
+                        onClick={() => setAvatarMode('dynamic')}
+                        className={`flex-1 py-2 text-[10px] font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer rounded-xl border-none flex items-center justify-center
+                          ${avatarMode === 'dynamic' ? 'neu-extruded text-primary bg-bg' : 'text-text-muted hover:text-text bg-transparent'}`}
+                      >
+                        <span>Dynamic (Name)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAvatarMode('preset')
+                          if (!selectedPresetSeed && randomSeeds.length > 0) {
+                            setSelectedPresetSeed(randomSeeds[0])
+                          }
+                        }}
+                        className={`flex-1 py-2 text-[10px] font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer rounded-xl border-none flex items-center justify-center
+                          ${avatarMode === 'preset' ? 'neu-extruded text-primary bg-bg' : 'text-text-muted hover:text-text bg-transparent'}`}
+                      >
+                        <span>Presets</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAvatarMode('custom-seed')}
+                        className={`flex-1 py-2 text-[10px] font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer rounded-xl border-none flex items-center justify-center
+                          ${avatarMode === 'custom-seed' ? 'neu-extruded text-primary bg-bg' : 'text-text-muted hover:text-text bg-transparent'}`}
+                      >
+                        <span>Custom Seed</span>
+                      </button>
+                    </div>
+
+                    {/* Mode Panels */}
+                    {avatarMode === 'dynamic' && (
+                      <div className="flex flex-col gap-1.5 p-4 rounded-2xl neu-inset bg-bg/50 text-left">
+                        <p className="text-xs font-bold text-text">
+                          Dynamic Seed: {fullName.trim() || 'default'}
+                        </p>
+                        <p className="text-[11px] text-text-muted leading-relaxed">
+                          Your avatar is generated dynamically using your display name. Changing your name on the left will instantly update your look!
+                        </p>
+                      </div>
+                    )}
+
+                    {avatarMode === 'preset' && (
+                      <div className="flex flex-col gap-3 text-left">
+                        <div className="flex items-center justify-between pl-1">
+                          <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                            Choose a seed or shuffle for new ones:
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const fresh = generateRandomSeeds(8)
+                              setRandomSeeds(fresh)
+                              setSelectedPresetSeed(fresh[0])
+                            }}
+                            className="bg-bg hover:-translate-y-0.5 text-text-muted hover:text-text active:scale-95 shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_rgba(255,255,255,0.65)] rounded-xl py-1.5 px-3.5 text-[10px] font-extrabold uppercase tracking-wider border-none flex items-center gap-1 cursor-pointer transition-all duration-200"
+                          >
+                            <Shuffle size={10} />
+                            <span>Shuffle</span>
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-4 gap-3 p-1">
+                          {randomSeeds.map(seed => {
+                            const isSelected = activePresetSeed === seed
+                            return (
+                              <button
+                                key={seed}
+                                type="button"
+                                onClick={() => setSelectedPresetSeed(seed)}
+                                className={`relative aspect-square rounded-2xl flex flex-col items-center justify-center p-1.5 cursor-pointer transition-all duration-200 border-none bg-bg
+                                  ${isSelected 
+                                    ? 'neu-inset scale-95 ring-2 ring-primary/40' 
+                                    : 'neu-extruded hover:-translate-y-0.5'}`}
+                                title={seed}
+                              >
+                                <img 
+                                  src={`https://api.dicebear.com/10.x/${selectedStyle}/svg?seed=${encodeURIComponent(seed)}`} 
+                                  alt={seed} 
+                                  className="w-full h-full object-contain rounded-xl"
+                                />
+                                <span className="text-[8px] font-mono text-text-muted truncate w-full text-center mt-1 font-bold">
+                                  {seed}
+                                </span>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {avatarMode === 'custom-seed' && (
+                      <div className="flex flex-col gap-2">
+                        <FormField 
+                          label="Custom Seed Text" 
+                          helperText="Type any words to generate a unique combination of attributes for the selected style."
+                        >
+                          <Input
+                            value={customSeed}
+                            onChange={e => setCustomSeed(e.target.value)}
+                            placeholder="e.g. IronMan, FlyingPanda, Batman"
+                            startIcon={<Type size={14} />}
+                          />
+                        </FormField>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ) : (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4 text-left">
                   <FormField 
                     label="Custom Image URL" 
                     helperText="Paste a URL to any online SVG, PNG, or JPG image to set it as your profile picture."
