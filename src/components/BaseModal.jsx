@@ -45,7 +45,7 @@ export default function BaseModal({
               className={`pointer-events-auto w-full ${maxW} bg-bg rounded-3xl flex flex-col`}
               style={{
                 maxHeight: '88dvh',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.16), 8px 8px 24px #d1d9e6, -8px -8px 24px #ffffff',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.16), 8px 8px 24px #d1d9e6, -8px -8px 24px rgba(255, 255, 255, 0.65)',
               }}
             >
               {/* ── Header ── */}

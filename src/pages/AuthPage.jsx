@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Eye, EyeOff, Zap } from 'lucide-react'
+import { Eye, EyeOff, Zap, Mail, Sparkles, X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
 import { PrimaryButton, FormField, Input } from '../components/DesignSystem'
@@ -27,8 +27,49 @@ export default function AuthPage() {
       if (error) toast.error(error.message)
     } else {
       const { error } = await signUp(email.trim(), password, fullName.trim())
-      if (error) toast.error(error.message)
-      else toast.success('Account created! Check your email to verify.')
+      if (error) {
+        toast.error(error.message)
+      } else {
+        toast.custom((t) => (
+          <div
+            className={`max-w-md w-full bg-bg/95 backdrop-blur-md rounded-2xl p-5 flex flex-col gap-4 border border-white/50 relative overflow-hidden pointer-events-auto
+              ${t.visible ? 'animate-toast-in' : 'animate-toast-out'}`}
+            style={{
+              boxShadow: '10px 10px 30px rgba(163, 177, 198, 0.35), -10px -10px 30px rgba(255, 255, 255, 0.8), 0 0 0 1px rgba(101, 163, 13, 0.1)',
+            }}
+          >
+            {/* Ambient primary green glow top right */}
+            <div className="absolute -top-10 -right-10 w-28 h-28 bg-primary/10 rounded-full blur-xl pointer-events-none" />
+            
+            <div className="flex gap-4 items-start relative z-10">
+              <div className="w-12 h-12 rounded-2xl neu-inset flex items-center justify-center text-primary bg-bg flex-shrink-0">
+                <Mail className="w-5 h-5 animate-bounce" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-display font-black text-text text-base flex items-center gap-1.5 leading-none">
+                  Check your mail! <Sparkles size={14} className="text-primary fill-primary/20 animate-pulse" />
+                </h3>
+                <p className="text-text-muted text-[10px] font-bold uppercase tracking-wider mt-1.5">
+                  Welcome to Splito, {fullName.trim().split(' ')[0]}!
+                </p>
+                <p className="text-text-muted text-xs font-semibold mt-1 leading-relaxed">
+                  We've sent a verification link to <span className="text-primary font-bold font-mono text-[11px] break-all">{email.trim()}</span>. Please verify your email to log in.
+                </p>
+              </div>
+              <button 
+                type="button"
+                onClick={() => toast.dismiss(t.id)}
+                className="w-7 h-7 rounded-full btn-icon text-text-muted hover:text-text cursor-pointer flex items-center justify-center flex-shrink-0"
+              >
+                <X size={14} />
+              </button>
+            </div>
+            
+            {/* A premium mini border accent line */}
+            <div className="w-full h-1 bg-gradient-to-r from-primary/30 via-primary to-primary/30 rounded-full opacity-60" />
+          </div>
+        ), { duration: 8000 })
+      }
     }
     setLoading(false)
   }

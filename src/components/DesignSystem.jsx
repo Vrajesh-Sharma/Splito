@@ -15,9 +15,7 @@ export function PageHeader({ title, subtitle, onBack, action, children }) {
         {onBack && (
           <button
             onClick={onBack}
-            className="mt-0.5 w-10 h-10 rounded-full neu-extruded flex items-center justify-center
-                       text-text-muted hover:text-text active:shadow-neumorphic-inset active:scale-95
-                       transition-all duration-200 cursor-pointer flex-shrink-0 bg-bg"
+            className="mt-0.5 w-10 h-10 btn-icon flex-shrink-0 bg-bg"
           >
             <ArrowLeft size={18} />
           </button>
@@ -47,11 +45,11 @@ export function Card({ children, className = '', onClick, style, ...rest }) {
       onClick={onClick}
       style={style}
       {...rest}
-      className={`bg-bg rounded-2xl neu-extruded transition-all duration-200 text-left
-        ${onClick
-          ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-[8px_14px_22px_#c2cbd6,-8px_-8px_16px_#ffffff] active:shadow-neumorphic-inset active:scale-[0.98]'
-          : ''
-        } ${className}`}
+      className={`bg-bg rounded-2xl text-left ${
+        onClick
+          ? 'cursor-pointer interactive-card border-none'
+          : 'neu-extruded'
+      } ${className}`}
     >
       {children}
     </Tag>
@@ -85,10 +83,7 @@ export function IconButton({ children, className = '', ...props }) {
   return (
     <button
       {...props}
-      className={`w-10 h-10 rounded-full bg-bg text-text-muted hover:text-text
-                  flex items-center justify-center neu-extruded
-                  active:shadow-neumorphic-inset active:scale-95
-                  transition-all duration-200 cursor-pointer ${className}`}
+      className={`w-10 h-10 btn-icon ${className}`}
     >
       {children}
     </button>
@@ -191,7 +186,7 @@ export function Chip({ children, active, className = '', ...props }) {
                   whitespace-nowrap transition-all duration-200 cursor-pointer flex-shrink-0
                   ${active
           ? 'bg-primary text-white shadow-[inset_2px_2px_4px_rgba(0,0,0,0.15)] scale-[0.98]'
-          : 'bg-bg shadow-[1px_1px_6px_#d1d9e6,-1px_-1px_6px_#ffffff] text-text-muted hover:text-text active:scale-[0.97]'
+          : 'bg-bg shadow-[1px_1px_6px_#d1d9e6,-1px_-1px_6px_rgba(255,255,255,0.65)] text-text-muted hover:text-text active:scale-[0.97]'
         } ${className}`}
     >
       {children}

@@ -6,6 +6,7 @@ import AuthPage from './pages/AuthPage'
 import HomePage from './pages/HomePage'
 import GroupPage from './pages/GroupPage'
 import GroupDetailPage from './pages/GroupDetailPage'
+import CustomCursor from './components/CustomCursor'
 
 function AppRoutes() {
   const { user, loading } = useAuth()
@@ -24,6 +25,7 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <CustomCursor />
         <AppRoutes />
         <Toaster
           position="top-center"
