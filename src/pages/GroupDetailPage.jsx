@@ -149,7 +149,7 @@ export default function GroupDetailPage() {
                     const neg = bal < -0.01
                     return (
                       <div key={m.id} className="flex items-center gap-3 py-2.5 border-b border-slate-200/20 last:border-0">
-                        <Avatar name={m.full_name} size="sm" />
+                        <Avatar name={m.full_name} url={m.avatar_url} size="sm" />
                         <span className="text-sm font-semibold text-text truncate flex-1" title={m.full_name}>
                           {m.full_name}
                         </span>

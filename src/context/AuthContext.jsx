@@ -28,6 +28,19 @@ export function AuthProvider({ children }) {
     setLoading(false)
   }
 
+  async function updateProfile(updates) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', user.id)
+      .select()
+      .single()
+    if (!error && data) {
+      setProfile(data)
+    }
+    return { data, error }
+  }
+
   async function signUp(email, password, fullName) {
     const { data, error } = await supabase.auth.signUp({
       email, password,
@@ -46,7 +59,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, profile, loading, signUp, signIn, signOut, updateProfile }}>
       {children}
     </AuthContext.Provider>
   )

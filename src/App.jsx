@@ -6,6 +6,7 @@ import AuthPage from './pages/AuthPage'
 import HomePage from './pages/HomePage'
 import GroupPage from './pages/GroupPage'
 import GroupDetailPage from './pages/GroupDetailPage'
+import ProfilePage from './pages/ProfilePage'
 import CustomCursor from './components/CustomCursor'
 
 function AppRoutes() {
@@ -17,6 +18,7 @@ function AppRoutes() {
       <Route path="/"        element={user ? <HomePage />        : <Navigate to="/auth" />} />
       <Route path="/groups"  element={user ? <GroupPage />       : <Navigate to="/auth" />} />
       <Route path="/groups/:id" element={user ? <GroupDetailPage /> : <Navigate to="/auth" />} />
+      <Route path="/profile" element={user ? <ProfilePage />     : <Navigate to="/auth" />} />
     </Routes>
   )
 }

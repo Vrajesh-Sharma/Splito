@@ -9,7 +9,7 @@ const COLORS = [
   'from-teal-500 to-emerald-600',
 ]
 
-export default function Avatar({ name = '', size = 'md' }) {
+export default function Avatar({ name = '', url = null, size = 'md' }) {
   const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
   const colorIndex = name.charCodeAt(0) % COLORS.length
   const sizes = { 
@@ -27,12 +27,12 @@ export default function Avatar({ name = '', size = 'md' }) {
   }
 
   const [imgError, setImgError] = useState(false)
-  const avatarUrl = `https://api.dicebear.com/10.x/fun-emoji/svg?seed=${encodeURIComponent(name.trim() || 'default')}`
+  const avatarUrl = url || `https://api.dicebear.com/10.x/fun-emoji/svg?seed=${encodeURIComponent(name.trim() || 'default')}`
 
   return (
     <div className={`${sizes[size]} ${rounded[size]} bg-white flex items-center justify-center font-bold text-text-muted flex-shrink-0 
                      shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_rgba(255,255,255,0.65)] border-2 border-[#eef1f6]/60 overflow-hidden`}>
-      {!imgError ? (
+      {!imgError && avatarUrl ? (
         <img 
           src={avatarUrl} 
           alt={name} 

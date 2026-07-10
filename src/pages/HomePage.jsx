@@ -25,9 +25,13 @@ export default function HomePage() {
           subtitle="Ready to split some bills?"
           action={
             <div className="flex items-center gap-2 md:hidden">
-              <div title={profile?.full_name ?? 'Profile'}>
-                <Avatar name={profile?.full_name ?? ''} size="lg" />
-              </div>
+              <button
+                onClick={() => navigate('/profile')}
+                title={profile?.full_name ?? 'Profile'}
+                className="hover:scale-105 active:scale-95 transition-transform duration-200 cursor-pointer border-none bg-transparent flex items-center justify-center"
+              >
+                <Avatar name={profile?.full_name ?? ''} url={profile?.avatar_url} size="lg" />
+              </button>
               <IconButton onClick={signOut} title="Sign out">
                 <LogOut size={15} />
               </IconButton>

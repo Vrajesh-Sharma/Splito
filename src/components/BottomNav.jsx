@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Home, Users, Plus, Zap, LogOut } from 'lucide-react'
+import { Home, Users, Plus, Zap, LogOut, User } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import Avatar from './Avatar'
 
@@ -64,6 +64,19 @@ export default function BottomNav({ onAddExpense }) {
           <Users size={18} />
           <span className="text-[10px] md:text-sm">Groups</span>
         </NavLink>
+
+        {/* Profile (Mobile only) */}
+        <NavLink
+          to="/profile"
+          className={({ isActive }) => `flex flex-col items-center justify-center gap-0.5 px-4 py-2 rounded-2xl transition-all duration-200 min-w-[70px] min-h-[48px]
+            md:hidden
+            ${isActive
+              ? 'shadow-neumorphic-inset text-primary font-extrabold'
+              : 'text-text-muted hover:text-text hover:shadow-neumorphic-inset active:scale-95 font-bold'}`}
+        >
+          <User size={18} />
+          <span className="text-[10px] md:text-sm">Profile</span>
+        </NavLink>
       </div>
 
       {/* User Controls & Add Expense CTA - Right (Desktop only) */}
@@ -82,9 +95,14 @@ export default function BottomNav({ onAddExpense }) {
         <div className="w-px h-6 bg-slate-200/50" />
 
         <div className="flex items-center gap-3">
-          <div className="hover:scale-105 transition-transform duration-200 ease-out cursor-pointer" title={profile?.full_name ?? 'Profile'}>
-            <Avatar name={profile?.full_name ?? ''} size="md" />
-          </div>
+          <NavLink
+            to="/profile"
+            className={({ isActive }) => `hover:scale-105 transition-transform duration-200 ease-out cursor-pointer rounded-xl flex items-center justify-center
+              ${isActive ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+            title={profile?.full_name ?? 'Profile'}
+          >
+            <Avatar name={profile?.full_name ?? ''} url={profile?.avatar_url} size="md" />
+          </NavLink>
           <button
             onClick={signOut}
             className="w-9 h-9 rounded-xl neu-extruded flex items-center justify-center text-text-muted hover:text-danger active:shadow-neumorphic-inset active:scale-95 transition-all duration-200 cursor-pointer bg-bg"
