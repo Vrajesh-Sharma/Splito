@@ -1,3 +1,3 @@
 This will be first commit
 
-PROTOTYPE is ready!
+Final website is ready!
