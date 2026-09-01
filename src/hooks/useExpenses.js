@@ -27,7 +27,7 @@ export function useExpenses(groupId) {
     const from = pageIndex * PAGE_SIZE
     const to   = from + PAGE_SIZE - 1
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('expenses')
       .select(`
         *,
@@ -52,14 +52,22 @@ export function useExpenses(groupId) {
 
   async function fetchAllExpenses() {
     if (!groupId) return
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('expenses')
       .select(`
+        id,
+        title,
+        category,
+        notes,
         paid_by,
         amount,
+        expense_date,
+        created_at,
         expense_splits(user_id, share_amount)
       `)
       .eq('group_id', groupId)
+      .order('expense_date', { ascending: false })
+      .order('created_at', { ascending: false })
     setAllExpenses(data ?? [])
   }
 

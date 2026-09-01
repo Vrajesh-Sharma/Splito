@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Copy, Users, Zap, Filter, Pencil, Trash2, Receipt, LayoutGrid, ChevronDown, CalendarDays } from 'lucide-react'
+import { Copy, Users, Zap, Filter, Pencil, Trash2, Receipt, LayoutGrid, ChevronDown, CalendarDays, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useGroups } from '../hooks/useGroups'
 import { useMembers } from '../hooks/useMembers'
@@ -10,7 +10,7 @@ import Avatar from '../components/Avatar'
 import CategoryBadge, { CATEGORIES } from '../components/CategoryBadge'
 import ExpenseModal from '../components/ExpenseModal'
 import SortOutModal from '../components/SortOutModal'
-import { format } from 'date-fns'
+import { format, startOfMonth, endOfMonth, addMonths, subMonths, isSameMonth } from 'date-fns'
 import toast from 'react-hot-toast'
 import { PageHeader, Card, PrimaryButton, SecondaryButton, Chip } from '../components/DesignSystem'
 
@@ -33,6 +33,22 @@ export default function GroupDetailPage() {
   const [sortOpen, setSortOpen] = useState(false)
   const [filter, setFilter] = useState('all')
   const [settlement, setSettlement] = useState(null)
+  const [viewMode, setViewMode] = useState('all') // 'all' | 'monthly'
+  const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()))
+
+  function goToPrevMonth() {
+    setCurrentMonth(subMonths(currentMonth, 1))
+  }
+
+  function goToNextMonth() {
+    setCurrentMonth(addMonths(currentMonth, 1))
+  }
+
+  function goToCurrentMonth() {
+    setCurrentMonth(startOfMonth(new Date()))
+  }
+
+  const isCurrentMonth = isSameMonth(currentMonth, new Date())
 
   // Per-member net balances
   const memberBalances = useMemo(() => {
@@ -47,10 +63,34 @@ export default function GroupDetailPage() {
     return bals
   }, [members, allExpenses])
 
-  const filteredExpenses = filter === 'all' ? expenses : expenses.filter(e => e.category === filter)
+  const monthStart = startOfMonth(currentMonth)
+  const monthEnd = endOfMonth(currentMonth)
 
-  const totalSpent = allExpenses.reduce((s, e) => s + parseFloat(e.amount), 0)
-  const mySpent = allExpenses.filter(e => e.paid_by === user?.id).reduce((s, e) => s + parseFloat(e.amount), 0)
+  const monthlyExpenses = allExpenses.filter(exp => {
+    let expDate
+    try {
+      if (exp.expense_date) {
+        expDate = new Date(exp.expense_date + 'T00:00:00')
+      } else if (exp.created_at) {
+        expDate = new Date(exp.created_at)
+      } else {
+        return false
+      }
+      if (isNaN(expDate.getTime())) return false
+      return expDate >= monthStart && expDate <= monthEnd
+    } catch {
+      return false
+    }
+  })
+
+  const baseExpenses = viewMode === 'monthly' ? monthlyExpenses : allExpenses
+
+  const filteredExpenses = filter === 'all' 
+    ? baseExpenses 
+    : baseExpenses.filter(e => e.category === filter)
+
+  const totalSpent = baseExpenses.reduce((s, e) => s + parseFloat(e.amount), 0)
+  const mySpent = baseExpenses.filter(e => e.paid_by === user?.id).reduce((s, e) => s + parseFloat(e.amount), 0)
 
   function copyCode() {
     navigator.clipboard.writeText(group?.invite_code ?? '')
@@ -107,14 +147,77 @@ export default function GroupDetailPage() {
           {/* ── LEFT SIDEBAR ── */}
           <div className="lg:col-span-4 flex flex-col gap-5">
 
-            {/* Stats row — 3 equal cards */}
+            {/* View Mode Toggle */}
+            <Card className="flex items-center gap-2 p-2" style={{ padding: '8px 12px' }}>
+              <button
+                onClick={() => setViewMode('all')}
+                className={`flex-1 py-2 text-xs font-extrabold uppercase tracking-wider rounded-xl transition-all duration-200 border-none
+                  ${viewMode === 'all' ? 'neu-inset text-primary bg-bg' : 'text-text-muted hover:text-text bg-transparent'}`}
+              >
+                All Time
+              </button>
+              <button
+                onClick={() => setViewMode('monthly')}
+                className={`flex-1 py-2 text-xs font-extrabold uppercase tracking-wider rounded-xl transition-all duration-200 border-none
+                  ${viewMode === 'monthly' ? 'neu-inset text-primary bg-bg' : 'text-text-muted hover:text-text bg-transparent'}`}
+              >
+                Monthly
+              </button>
+            </Card>
+
+            {/* Month Selector (only in monthly mode) */}
+            {viewMode === 'monthly' && (
+              <Card className="flex items-center justify-between" style={{ padding: '16px 20px' }}>
+                <button
+                  onClick={goToPrevMonth}
+                  className="p-2 rounded-xl neu-extruded text-text-muted hover:text-primary transition-colors active:shadow-neumorphic-inset"
+                  aria-label="Previous month"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <div className="flex items-center gap-2">
+                  <Calendar size={16} className="text-text-muted" />
+                  <span className="font-display font-bold text-lg text-text tabular-nums">
+                    {format(currentMonth, 'MMMM yyyy')}
+                  </span>
+                  {!isCurrentMonth && (
+                    <button
+                      onClick={goToCurrentMonth}
+                      className="ml-2 px-2 py-1 rounded-full text-[10px] font-bold text-primary bg-primary/10 hover:bg-primary/20 transition-colors"
+                    >
+                      This Month
+                    </button>
+                  )}
+                </div>
+                <button
+                  onClick={goToNextMonth}
+                  disabled={isCurrentMonth}
+                  className={`p-2 rounded-xl transition-colors ${isCurrentMonth 
+                    ? 'text-text-muted/30 cursor-not-allowed' 
+                    : 'neu-extruded text-text-muted hover:text-primary active:shadow-neumorphic-inset'}`}
+                  aria-label="Next month"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </Card>
+            )}
+
+            {/* Stats Cards */}
             <div className="grid grid-cols-3 gap-3">
-              {[
-                { label: 'Total', value: `₹${totalSpent.toFixed(0)}`, primary: false },
-                { label: 'You Paid', value: `₹${mySpent.toFixed(0)}`, primary: true },
-                { label: 'Members', value: members.length, primary: false },
-              ].map((stat, i) => (
-                <Card key={i} className="flex flex-col items-center justify-center text-center" style={{ padding: 16 }}>
+              {(
+                viewMode === 'monthly'
+                  ? [
+                      { label: 'Total', value: `₹${totalSpent.toFixed(0)}`, primary: false },
+                      { label: 'You Paid', value: `₹${mySpent.toFixed(0)}`, primary: true },
+                      { label: 'Members', value: members.length, primary: false },
+                    ]
+                  : [
+                      { label: 'Total', value: `₹${totalSpent.toFixed(0)}`, primary: false },
+                      { label: 'You Paid', value: `₹${mySpent.toFixed(0)}`, primary: true },
+                      { label: 'Members', value: members.length, primary: false },
+                    ]
+              ).map((stat, i) => (
+                <Card key={stat.label} className="flex flex-col items-center justify-center text-center" style={{ padding: 16 }}>
                   <p className={`font-display font-black text-base tabular-nums leading-tight
                                  ${stat.primary ? 'text-primary' : 'text-text'}`}>
                     {stat.value}
@@ -230,10 +333,21 @@ export default function GroupDetailPage() {
                     <Receipt size={20} />
                   </div>
                   <div>
-                    <p className="font-bold text-text text-sm">No expenses yet</p>
-                    <p className="text-text-muted text-xs mt-1 max-w-[28ch] mx-auto">
-                      Tap "+" in the nav bar to add your first expense.
-                    </p>
+                    {viewMode === 'monthly' && !isCurrentMonth ? (
+                      <>
+                        <p className="font-bold text-text text-sm">No expenses in this month</p>
+                        <p className="text-text-muted text-xs mt-1 max-w-[28ch] mx-auto">
+                          There were no expenses recorded for this month.
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="font-bold text-text text-sm">No expenses yet</p>
+                        <p className="text-text-muted text-xs mt-1 max-w-[28ch] mx-auto">
+                          Tap "+" in the nav bar to add your first expense.
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
               ) : (
@@ -241,9 +355,18 @@ export default function GroupDetailPage() {
                   {filteredExpenses.map(exp => {
                     const isMine = exp.paid_by === user?.id
                     const CatIcon = CATEGORIES[exp.category]?.icon ?? CATEGORIES.other.icon
-                    const dateLabel = exp.expense_date
-                      ? format(new Date(exp.expense_date + 'T00:00:00'), 'dd MMM yyyy')
-                      : format(new Date(exp.created_at), 'dd MMM yyyy')
+                    let dateLabel = 'Unknown date'
+                    try {
+                      const dateStr = exp.expense_date
+                        ? exp.expense_date + 'T00:00:00'
+                        : exp.created_at
+                      const date = new Date(dateStr)
+                      if (!isNaN(date.getTime())) {
+                        dateLabel = format(date, 'dd MMM yyyy')
+                      }
+                    } catch {
+                      dateLabel = 'Invalid date'
+                    }
                     const paidByName = isMine ? 'You' : exp.profiles?.full_name?.split(' ')[0] || 'Member'
                     const splitCount = exp.expense_splits?.length ?? 0
 
