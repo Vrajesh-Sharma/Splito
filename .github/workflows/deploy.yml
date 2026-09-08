@@ -50,6 +50,23 @@ jobs:
             exit 1
           fi
 
+      - name: Validate Supabase URL
+        run: |
+          URL=$(grep '^VITE_SUPABASE_URL=' .vercel/.env.production.local | cut -d '=' -f2-)
+
+          echo "URL length: ${#URL}"
+
+          if [[ "$URL" =~ ^https:// ]]; then
+            echo "URL starts with https://"
+          elif [[ "$URL" =~ ^http:// ]]; then
+            echo "URL starts with http://"
+          else
+            echo "ERROR: URL does NOT start with http:// or https://"
+            exit 1
+          fi
+
+          node -e "const u = new URL(process.argv[1]); console.log('Valid URL:', u.origin)" "$URL"
+
       - name: Build
         run: vercel build --prod --token="$VERCEL_TOKEN"
 
